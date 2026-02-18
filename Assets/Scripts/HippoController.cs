@@ -4,8 +4,10 @@ public class HippoController : MonoBehaviour
 {
     public float speed = .1f;
     public float jumpHeight = .5f;
+    public float acceleration = 3f;
+    public float deceleration = 12f;
 
-    public float momentum = 1.1f;
+    float horizontalVelocity;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -20,29 +22,25 @@ public class HippoController : MonoBehaviour
 
     void MovePlayer()
     {
+        // Horizontal movement: accelerate toward top speed, decelerate quickly when key released
+        float targetVelocity = 0f;
         if (Input.GetKey(KeyCode.RightArrow))
-        {
-            Vector2 curPos = gameObject.transform.position;
-            Vector2 newPos = new Vector2(curPos.x + Time.deltaTime * speed * momentum, curPos.y);
-            gameObject.transform.position = newPos;
-        }
+            targetVelocity = speed;
         if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            Vector2 curPos = gameObject.transform.position;
-            Vector2 newPos = new Vector2(curPos.x - Time.deltaTime * speed * momentum, curPos.y);
-            gameObject.transform.position = newPos;
-        }
+            targetVelocity = -speed;
+        float rate = (Mathf.Abs(targetVelocity) > 0.01f) ? acceleration : deceleration;
+        horizontalVelocity = Mathf.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
+        Vector2 curPos = gameObject.transform.position;
+        gameObject.transform.position = new Vector2(curPos.x + horizontalVelocity * Time.deltaTime, curPos.y);
         if (Input.GetKey(KeyCode.Space))
         {
-            Vector2 curPos = gameObject.transform.position;
-            Vector2 newPos = new Vector2(curPos.x, curPos.y + jumpHeight);
-            gameObject.transform.position = newPos;
+            curPos = gameObject.transform.position;
+            gameObject.transform.position = new Vector2(curPos.x, curPos.y + jumpHeight);
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            Vector2 curPos = gameObject.transform.position;
-            Vector2 newPos = new Vector2(curPos.x, curPos.y - jumpHeight);
-            gameObject.transform.position = newPos;
+            curPos = gameObject.transform.position;
+            gameObject.transform.position = new Vector2(curPos.x, curPos.y - jumpHeight);
         }
     }
 }

@@ -474,6 +474,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HippoController
   speed: 5
   jumpHeight: 0.01
+  acceleration: 6
+  deceleration: 12
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
