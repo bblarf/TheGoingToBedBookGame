@@ -6,12 +6,12 @@ public class HippoController : MonoBehaviour
     public float jumpHeight = .5f;
     public float acceleration = 3f;
     public float deceleration = 12f;
-
+    public SpriteRenderer spriteRenderer;
     float horizontalVelocity;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -24,10 +24,15 @@ public class HippoController : MonoBehaviour
     {
         // Horizontal movement: accelerate toward top speed, decelerate quickly when key released
         float targetVelocity = 0f;
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow)){
             targetVelocity = speed;
+            spriteRenderer.flipX = true;
+        }
         if (Input.GetKey(KeyCode.LeftArrow))
+        {
             targetVelocity = -speed;
+            spriteRenderer.flipX = false;
+        }
         float rate = (Mathf.Abs(targetVelocity) > 0.01f) ? acceleration : deceleration;
         horizontalVelocity = Mathf.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
         Vector2 curPos = gameObject.transform.position;
