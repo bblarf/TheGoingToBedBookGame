@@ -4,10 +4,12 @@ public class HippoController : MonoBehaviour
 {
     public float speed = .1f;
     public float jumpHeight = 1.5f;
+    public float gravity = 9f;
     public float acceleration = 3f;
     public float deceleration = 12f;
     public SpriteRenderer spriteRenderer;
     float horizontalVelocity;
+    float verticalVelocity;
     public LayerMask groundLayer;
 
     [Header("Ground check")]
@@ -60,11 +62,11 @@ public class HippoController : MonoBehaviour
     {
         // Horizontal movement: accelerate toward top speed, decelerate quickly when key released
         float targetVelocity = 0f;
-        if (Input.GetKey(KeyCode.RightArrow)){
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)){
             targetVelocity = speed;
             spriteRenderer.flipX = true;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             targetVelocity = -speed;
             spriteRenderer.flipX = false;
@@ -72,18 +74,31 @@ public class HippoController : MonoBehaviour
         float rate = (Mathf.Abs(targetVelocity) > 0.01f) ? acceleration : deceleration;
         horizontalVelocity = Mathf.MoveTowards(horizontalVelocity, targetVelocity, rate * Time.deltaTime);
         Vector2 curPos = gameObject.transform.position;
-        gameObject.transform.position = new Vector2(curPos.x + horizontalVelocity * Time.deltaTime, curPos.y);
 
         bool grounded = IsGrounded();
         if (grounded)
         {
             jumpUsedSinceGrounded = false;
+            if (verticalVelocity < 0f)
+            {
+                verticalVelocity = 0f;
+            }
         }
         if (Input.GetKeyDown(KeyCode.Space) && grounded && !jumpUsedSinceGrounded)
         {
             jumpUsedSinceGrounded = true;
-            curPos = gameObject.transform.position;
-            gameObject.transform.position = new Vector2(curPos.x, curPos.y + jumpHeight);
+            // Solve v from jumpHeight using v^2 = 2 * g * h.
+            verticalVelocity = Mathf.Sqrt(2f * gravity * jumpHeight);
         }
+
+        if (!grounded || verticalVelocity > 0f)
+        {
+            verticalVelocity -= gravity * Time.deltaTime;
+        }
+
+        gameObject.transform.position = new Vector2(
+            curPos.x + horizontalVelocity * Time.deltaTime,
+            curPos.y + verticalVelocity * Time.deltaTime
+        );
     }
 }
